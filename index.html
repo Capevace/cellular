@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Cellular Automata</title>
+  </head>
+  <body>
+    <main>
+      <canvas id="row-canvas" width="600" height="300"></canvas>
+    </main>
+  </body>
+
+  <script type="text/javascript">
+    const canvas = document.querySelector('#row-canvas');
+    const context = canvas.getContext('2d');
+
+    const lineLength = 100;
+    const maxLineCount = 50;
+    const nodeSize = {
+      width: canvas.width / lineLength,
+      height: canvas.height / maxLineCount
+    };
+
+    let currentLine = [];
+    let currentLineIndex = 0;
+
+    function drawLine(y, nodes) {
+      for (let i = 0; i < nodes.length; i++) {
+        context.fillStyle = nodes[i] === 0 ? 'red' : 'green';
+        context.fillRect(i * nodeSize.width, y * nodeSize.width, nodeSize.width, nodeSize.height);
+      }
+    }
+
+    renderLoop();
+
+    function renderLoop() {
+      if (currentLineIndex < maxLineCount) {
+        if (currentLineIndex === 0) {
+          currentLine = generateRandomLine();
+        } else {
+          currentLine = generateLineFromLine(currentLine);
+        }
+        // console.log(currentLine);
+        drawLine(currentLineIndex, currentLine);
+        currentLineIndex++;
+
+        renderLoop();
+      }
+    }
+
+    function generateRandomLine() {
+      return new Array(lineLength)
+        .fill(undefined)
+        .map(() => Math.round(Math.random()))
+    }
+
+
+    function generateLineFromLine(currentLine) {
+      let newLine = [];
+
+      for (let i = 0; i < currentLine.length; i++) {
+        const lN = parseUndefined(currentLine[i - 1]);
+        const node = currentLine[i];
+        const rN = parseUndefined(currentLine[i + 1]);
+
+        // 111
+        if (lN === 1 && node === 1 && rN === 1) { // 111 -> 1
+          newLine.push(0);
+        }
+        // 110
+        else if (lN === 1 && node === 1 && rN === 0) { // 110 -> 0
+          newLine.push(1);
+        }
+
+        // 101
+        else if (lN === 1 && node === 0 && rN === 1) { // 101 -> 1
+          newLine.push(0);
+        }
+
+        // 100
+        else if (lN === 1 && node === 0 && rN === 0) { // 100 -> 1
+          newLine.push(0);
+        }
+
+        // 011
+        else if (lN === 0 && node === 1 && rN === 1) { // 011 -> 1
+          newLine.push(1);
+        }
+
+        // 010
+        else if (lN === 0 && node === 1 && rN === 0) { // 010 -> 1
+          newLine.push(0);
+        }
+
+        // 001
+        else if (lN === 0 && node === 0 && rN === 1) { // 001 -> 1
+          newLine.push(0);
+        }
+
+        // 000
+        else if (lN === 0 && node === 0 && rN === 0) { // 000 -> 0
+          newLine.push(1);
+        }
+
+        else {
+          console.log(lN, node, rN);
+        }
+      }
+      console.log(newLine);
+      return newLine;
+    }
+
+    function parseUndefined(node) {
+      return node === undefined ? 1 : 0;
+    }
+  </script>
+</html>
